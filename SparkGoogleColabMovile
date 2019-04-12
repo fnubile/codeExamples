@@ -1,0 +1,36 @@
+#Instalando as bibliotecas necessárias
+!apt-get install openjdk-8-jdk-headless -qq > /dev/null
+!wget -q http://www-eu.apache.org/dist/spark/spark-2.4.1/spark-2.4.1-bin-hadoop2.7.tgz
+!tar xf spark-2.4.1-bin-hadoop2.7.tgz
+!pip install -q findspark
+!pip install -q pyspark
+
+#Variáveis de ambiente
+import os
+os.environ["JAVA_HOME"] = "/usr/lib/jvm/java-8-openjdk-amd64"
+os.environ["SPARK_HOME"] = "/content/spark-2.4.1-bin-hadoop2.7"
+
+#Encontrando e instanciando o Spark Session
+import findspark
+findspark.init()
+from pyspark.sql import SparkSession
+spark = SparkSession.builder.master("local[*]").getOrCreate()
+
+from pyspark.sql import *
+
+dataset = spark.read.format("json").option("multiLine",True).load("sample_data/anscombe.json")
+dataset.columns
+
+dataset.show(10)
+
+dataset.printSchema()
+
+from pyspark.sql import functions as F
+dataset_agrupado = dataset.groupBy("Series") \
+                          .agg(F.avg("X").alias("X_agrupado"), F.avg("Y").alias("Y_agrupado"))  \
+                          .orderBy("Series")
+
+dataset_agrupado.show()
+
+dataset_agrupado.explain()
+
