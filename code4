@@ -1,0 +1,2 @@
+dataset = spark.read.format("json").option("multiLine",True).load("sample_data/anscombe.json")
+dataset.columns
