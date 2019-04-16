@@ -1,0 +1,6 @@
+from pyspark.sql import functions as F
+dataset_agrupado = dataset.groupBy("Series") \
+                          .agg(F.avg("X").alias("X_agrupado"), F.avg("Y").alias("Y_agrupado"))  \
+                          .orderBy("Series")
+
+dataset_agrupado.show()
